@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Corner Rounding Example</title>
+    <meta charset="utf-8" />
+    <style>
+    body>code {
+       display: block;
+       padding: 1em 0 1em 1em;
+       border-left: solid 1px #ccc;
+       margin: 1em 0 1em 2em;
+       white-space: pre;
+    }
+    img,
+    .rounder {
+      -webkit-border-radius: 10px;
+         -moz-border-radius: 10px;
+              border-radius: 10px;
+      -webkit-box-shadow: 0 0 5px 2px rgba(0,0,0,.5);
+         -moz-box-shadow: 0 0 5px 2px rgba(0,0,0,.5);
+              box-shadow: 0 0 5px 2px rgba(0,0,0,.5);
+    }
+    </style>
+    <!--[if lt IE 9]>
+    <style>
+    .rounder {
+    behavior: url(/css/PIE.htc);
+    }
+    </style>
+    <![endif]-->
+    
+</head>
+
+<body>
+  <p>First of off, browser sniffing is bad.</p>
+
+  <h2>The Situation</h2>
+  <p>Firefox has supported rounded corners with CSS for a while. First with the vendor extension <code>-moz-border-radius</code>, and now with the specification <code>border-radius</code>. The problem is it doesn't work on images (&lt;img&gt; elements). This has been fixed in Gecko 2.0b7. Right now the current Firefox beta is using Gecko 2.0b6.</p>
+
+  <p>In a slightly less-than perfect world we could wrap out images in &lt;div&gt; tags and round the corners on those. Let's do that. (We'll be using jQuery by the way, because I love it.)
+  </p>
+  <code>
+     $('img').wrap('&lt;div class="rounder" /&gt;');
+  </code>
+
+  <p>Sadly, that doesn't seem to work in Firefox any better than rounding the images directly.
+  </p>
+  <p>We know rounding background images works, so we need to get our inline images to become background images.
+  </p>
+  <code>
+  $('.rounder').each(function(i,e){
+     $(e).css('backgroundImage','url('+$(e).children('img').attr('src')+')');
+     $(e).children('img').remove(); 
+  });
+  </code>
+
+  <p>Let's toss all of that in a function.
+  </p>
+  <code>
+  function round_corners(){
+     $('img').wrap('&lt;div class="rounder" /&gt;');
+     $('.rounder').each(function(i,e){
+        $(e).css('backgroundImage','url('+$(e).children('img').attr('src')+')');
+        $(e).children('img').remove(); 
+     });
+  }
+  </code>
+
+  <p>We can call that from wherever, and as an added bonus, we can make IE do it too<sup>*</sup>
+
+  <p>So we have a work around, but once the browser supports it natively, we want to let that happen. Since we know when the support is being added, we can check the user agent string for the right version:
+  </p>
+  <code>
+  if($browser.mozilla &amp;&amp; $.browser.version.match(/^(1|(2\.0b[0-6]))/)){
+     round_corners();
+  }
+  </code>
+
+  <p>Bonus: we can use this to improve things in IE8 as well!</p>
+
+  <p>IE8 does not do <code>border-radius</code>, however you can make use of something useful like <a href="http://www.css3pie.com">PIE</a> to round corners. PIE is limited in the same way as Firefox in regard to rounding corners on &lt;img&gt; tags. So we can toss our handy function inside an IE conditional comment targetting versions older than IE9 (becuase IE9 does do rounded corners on &lt;img&gt; tags).
+  </p>
+  <p><strong>Update:</strong> The awesome people working on PIE have <a href="https://github.com/lojjic/PIE/commit/b392f432797b1efaaabff522ca856f0113319ce3">fixed this issue</a> for an upcoming release. Now you should only need to use this javascript technique in Mozilla!</p>
+
+  <code>
+  &lt;!--[if lt IE 9]&gt;
+  &lt;script&gt;
+  round_corners();
+  &lt;/script&gt;
+  &lt;![endif]--&gt;
+  </code>
+
+  <h2>All together now</h2>
+  <code>
+  &lt;script&gt;
+     function round_corners(){
+        $('img').wrap('&lt;div class="rounder" /&gt;');
+        $('.rounder').each(function(i,e){
+           $(e).css('backgroundImage','url('+$(e).children('img').attr('src')+')');
+           $(e).children('img').remove(); 
+        });
+     }
+
+     if($browser.mozilla &amp;&amp; $.browser.version.match(/^(1|(2\.0b[0-6]))/)){
+        round_corners();
+     }
+  &lt;/script&gt;
+  &lt;!--[if lt IE 9]&gt;
+  &lt;script&gt;
+     round_corners();
+  &lt;/script&gt;
+  &lt;![endif]--&gt;
+  </code>
+
+  <p>All you need to do is make sure you replace 'img' with whatever selector you want to replace (unless you want to replace every single image). Also, make sure in your CSS you add the <code>.rounder</code> selector to any rules that would round the corners on an image.
+  </p>
+
+  <h2>Caveat</h2>
+  <p>If you replace an image which is being scaled down in the markup, or with CSS, it may display off center, or cut off, or otherwise not quite right as a background image.</p>
+  
+  <h2>Example</h2>
+<img src="./stones.jpg" alt="" />
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script> 
+<script>
+   function round_corners(){
+      $('img').wrap('<div class="rounder" />');
+      $('.rounder').each(function(i,e){
+         $(e).css('backgroundImage','url('+$(e).children('img').attr('src')+')');
+         $(e).children('img').remove(); 
+      });
+   }
+
+   if($browser.mozilla && $.browser.version.match(/^(1|(2\.0b[0-6]))/)){
+      round_corners();
+   }
+</script>
+<!--[if lt IE 9]>
+<script>
+   round_corners();
+</script>
+<![endif]-->
+</body>
+</html>

@@ -32,10 +32,10 @@
 </head>
 
 <body>
-  <p>First of off, browser sniffing is bad.</p>
-
+  <h1>Corner Rounding for IE and Mozilla</h1>
   <h2>The Situation</h2>
   <p>Firefox has supported rounded corners with CSS for a while. First with the vendor extension <code>-moz-border-radius</code>, and now with the specification <code>border-radius</code>. The problem is it doesn't work on images (&lt;img&gt; elements). This has been fixed in Gecko 2.0b7. Right now the current Firefox beta is using Gecko 2.0b6.</p>
+  
 
   <p>In a slightly less-than perfect world we could wrap out images in &lt;div&gt; tags and round the corners on those. Let's do that. (We'll be using jQuery by the way, because I love it.)
   </p>
@@ -117,28 +117,30 @@
 
   <h2>Caveat</h2>
   <p>If you replace an image which is being scaled down in the markup, or with CSS, it may display off center, or cut off, or otherwise not quite right as a background image.</p>
-  
+
   <h2>Example</h2>
-<img src="./stones.jpg" alt="" />
+  <img src="./stones.jpg" alt="">
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script> 
-<script>
-   function round_corners(){
-      $('img').wrap('<div class="rounder" />');
-      $('.rounder').each(function(i,e){
-         $(e).css('backgroundImage','url('+$(e).children('img').attr('src')+')');
-         $(e).children('img').remove(); 
-      });
-   }
+  <p>See this in action on <a href="http://www.grace.edu/about" title="About Grace">http://www.grace.edu/about</a>.
+  </p>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script> 
+  <script>
+     function round_corners(){
+        $('img').wrap('<div class="rounder" />');
+        $('.rounder').each(function(i,e){
+           $(e).css('backgroundImage','url('+$(e).children('img').attr('src')+')');
+           $(e).children('img').remove(); 
+        });
+     }
 
-   if($browser.mozilla && $.browser.version.match(/^(1|(2\.0b[0-6]))/)){
-      round_corners();
-   }
-</script>
-<!--[if lt IE 9]>
-<script>
-   round_corners();
-</script>
-<![endif]-->
+     if($browser.mozilla && $.browser.version.match(/^(1|(2\.0b[0-6]))/)){
+        round_corners();
+     }
+  </script>
+  <!--[if lt IE 9]>
+  <script>
+     round_corners();
+  </script>
+  <![endif]-->
 </body>
 </html>
